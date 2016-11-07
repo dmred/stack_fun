@@ -80,9 +80,9 @@ return _counter;
 
 template<typename T>
 class allocator
+{
 public:
 	explicit allocator(size_t size = 0);
-	~allocator();
 	auto swap(allocator& other)->void; /*noexcept*/
 	allocator(allocator const &); /*strong*/
 	//allocator(allocator const&) = delete;
@@ -95,6 +95,7 @@ public:
 	auto count() const -> size_t; /*noexcept*/
 	auto full() const -> bool; /*noexcept*/
 	auto empty() const -> bool; /*noexcept*/
+	~allocator();
 private:
 	T * _array;
 	size_t _size;
