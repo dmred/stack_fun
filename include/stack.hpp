@@ -1,6 +1,8 @@
 #include <iostream>
+#include <new>  
 #include <stdexcept>
-
+#include <vector>
+#include <memory>
 // ╔══╗╔══╦════╦══╦═══╦════╗
 // ║╔╗║╚╗╔╩═╗╔═╣╔═╣╔══╩═╗╔═╝
 // ║╚╝╚╗║║──║║─║╚═╣╚══╗─║║
