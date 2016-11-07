@@ -132,7 +132,7 @@ allocator<T>::allocator(allocator const & tmp) :
 		construct(_array + i, tmp._array[i]);
 }
 
-destroy from to
+//destroy from to
 template <typename FwdIter>
 void destroy(FwdIter first, FwdIter last) noexcept
 {
