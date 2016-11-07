@@ -100,6 +100,7 @@ private:
 	T * _array;
 	size_t _size;
 	std::unique_ptr<bitset> _map;
+	auto destroy(T * first, T * last) -> void; /*noexcept*/
 };
 
 //placement new
@@ -131,14 +132,14 @@ allocator<T>::allocator(allocator const & tmp) :
 		construct(_array + i, tmp._array[i]);
 }
 
-//destroy from to
-// template <typename FwdIter>
-// void destroy(FwdIter first, FwdIter last) noexcept
-// {
-// 	for (; first != last; ++first) {
-// 		destroy(&*first);
-// 	}
-// }
+destroy from to
+template <typename FwdIter>
+void destroy(FwdIter first, FwdIter last) noexcept
+{
+	for (; first != last; ++first) {
+		destroy(&*first);
+	}
+}
 
 //constructor allocator
 template <typename T>
@@ -150,8 +151,8 @@ allocator<T>::allocator(size_t size) : _array(static_cast<T *>(size == 0 ? nullp
 //destructor allocator
 template <typename T>
 allocator<T>::~allocator() {
-	if (this->counter() > 0) {
-		destroy(_array, _array + _size);
+	if (_map->counter() > 0) {
+		destroy(_array, _array + _map->counter());
 	}
 	operator delete(_array);
 
@@ -166,12 +167,14 @@ auto allocator<T>::swap(allocator& other)->void {
 };
 
 template<typename T>
-auto allocator<T>::resize() -> void;
+auto allocator<T>::resize() -> void
 {
-	size_t size = _size *2 + (_size == 0);
+	size_t size = _size * 2 + (_size == 0);
 	allocator<T> tmp(size);
-	for (size_t i = 0 ; i < _size; ++i)
-		tmp.construct(tmp._array + i, _array[i]);
+	for (size_t i = 0; i < _size; ++i) {
+	if (_map->test(i))
+{		tmp.construct(tmp._array + i, _array[i]);}
+	}
 	this->swap(tmp);
 	//_size = size;
 }
@@ -210,7 +213,7 @@ auto allocator<T>::full() const -> bool {
 // ╚══╝─╚╝─╚╝╚╩══╩╝╚══╝
 
 template <typename T>
-class stack : 
+class stack
 {
 private:
 	allocator<T> allocate;
