@@ -18,6 +18,7 @@ class bitset
 		bitset(bitset const &) = delete;
 		bitset(bitset &&) = delete;
 		auto operator=(bitset &&) -> bitset & = delete;
+		auto operator =(bitset const & )->bitset & = delete;
 		auto set(size_t index) -> void;/*strong*/
 		auto reset(size_t index) -> void;/*strong*/
 		auto test(size_t index) -> bool; /*strong*/
@@ -33,7 +34,7 @@ bitset::bitset(size_t size) : _array(std::make_unique<bool[]>(size)), _size(size
 
 auto bitset::test(size_t index) -> bool
 {
-	if (index>=size()) throw std::out_of_range("error");
+	if (index>size()) throw std::out_of_range("error");
 	else return _array[index];
 }
 		
@@ -124,9 +125,7 @@ auto allocator<T>::destroy(T * ptr) -> void
 
 template<typename T>/////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 allocator<T>::allocator(allocator const & tmp) :
-	_array(static_cast<T *>(tmp._size == 0 ? nullptr : operator new(tmp._size * sizeof(T)))),
-	_size(tmp._size),
-	_map(std::make_unique<bitset>(tmp._size)) 
+	allocator<T>(tmp._size)
 {
 	for (size_t i = 0; i < _size; ++i) 
 		construct(_array + i, tmp._array[i]);
@@ -134,7 +133,7 @@ allocator<T>::allocator(allocator const & tmp) :
 
 //destroy from to
 template <typename T>
-auto destroy(T * first, T * last) -> void
+auto allocator<T>::destroy(T * first, T * last) -> void
 {
 	for (; first != last; ++first) {
 		destroy(&*first);
@@ -160,7 +159,8 @@ allocator<T>::~allocator() {
 
 //swap allocator
 template <typename T>
-auto allocator<T>::swap(allocator& other)->void {
+auto allocator<T>::swap(allocator& other)->void 
+{
 	std::swap(_array, other._array);
 	std::swap(_size, other._size);
 	std::swap(_map, other._map);
@@ -221,13 +221,14 @@ public:
 	explicit 
 	stack(size_t size = 0);/*noexcept*/
 	//stack(stack const &); /*strong*/
-	auto count() const noexcept->size_t;/*noexcept*/
+	auto count() const ->size_t;/*noexcept*/
 	auto push(T const &)->void;/*strong*/
 	auto pop()->void;/*strong*/
 	auto top() const->T const &;/*strong*/
 	auto top() -> T&;/*strong*/
 	//~stack(); 	/*noexcept*/
-	auto operator=(const stack&tmp)->stack&;/*strong*/
+	auto operator=(const stack &)->stack&;/*strong*/
+	stack(stack const & other) =default;
 	auto empty() const ->bool;/*noexcept*/
 
 };
@@ -257,16 +258,15 @@ stack<T>::stack(size_t size): allocate(size) {};
 // };
 
 template <typename T>
-auto stack<T>::count() const noexcept->size_t {
+auto stack<T>::count() const ->size_t {
 	return allocate.count();
 }
 
 template <typename T>
 auto stack<T>::push(T const &val)->void 
 	{
-	if (allocate.empty() == true || allocate.full() == true) {
+	if (allocate.empty() == true || allocate.full() == true) 
 		allocate.resize();
-	}
 	allocate.construct(allocate.get() + allocate.count(), val);
 }
 
@@ -299,9 +299,7 @@ auto stack<T>::top()->T&
 template <typename T>
 auto stack<T>::operator=(const stack &tmp)->stack& {
 	if (this != &tmp) 
-	{
 		 stack(tmp).allocate.swap(allocate);
-	}
 	return *this;
 }
 
