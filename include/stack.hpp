@@ -133,8 +133,8 @@ allocator<T>::allocator(allocator const & tmp) :
 }
 
 //destroy from to
-template <typename FwdIter>
-auto destroy(FwdIter * first, FwdIter * last) -> void
+template <typename T>
+auto destroy(T * first, T * last) -> void
 {
 	for (; first != last; ++first) {
 		destroy(&*first);
