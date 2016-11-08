@@ -45,7 +45,7 @@ auto bitset::set(size_t index) -> void
 		{
 			_array[index] = true;
 			++_counter;
-			std::cout<<_counter << "counter"<< std::endl;
+			//std::cout<<_counter << "counter"<< std::endl;
 		}
 	else throw std::out_of_range("error");
 }
