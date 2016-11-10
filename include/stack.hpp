@@ -128,8 +128,15 @@ template<typename T>/////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 allocator<T>::allocator(allocator const & tmp) :
 	allocator<T>(tmp._size)
 {
-	for (size_t i = 0; i < _size; ++i) 
+		{
+	for (size_t i = 0; i < _size; ++i) {
+		if (map_->test(i)) {
+			destroy(_array + i);
+		}
 		construct(_array + i, tmp._array[i]);
+	}
+	//for (size_t i = 0; i < _size; ++i) 
+		//construct(_array + i, tmp._array[i]);
 }
 
 //destroy from to
@@ -152,7 +159,7 @@ allocator<T>::allocator(size_t size) : _array(static_cast<T *>(size == 0 ? nullp
 template <typename T>
 allocator<T>::~allocator() {
 	if (_map->counter() > 0) {
-		destroy(_array, _array + _map->counter());
+		destroy(_array, _array + _map->size());
 	}
 	operator delete(_array);
 
