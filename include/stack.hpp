@@ -130,7 +130,7 @@ allocator<T>::allocator(allocator const & tmp) :
 {
 		{
 	for (size_t i = 0; i < _size; ++i) {
-		if (map_->test(i)) {
+		if (_map->test(i)) {
 			destroy(_array + i);
 		}
 		construct(_array + i, tmp._array[i]);
